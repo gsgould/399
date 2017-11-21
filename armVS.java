@@ -348,7 +348,7 @@ public class armVS {
     	double pos[] = new double[]{ tracker.x, tracker.y};
     	double dpos[] = new double[2];
     	double jacobian[][] = new double[2][2];
-    	double dt = 5; // change in the theta
+    	double dt = 20; // change in the theta
     	
     	// change th1 and get du, dv
     	dtheta[0] = theta[0] + dt;
@@ -365,6 +365,11 @@ public class armVS {
     	dtheta[0] = theta[0];
     	dtheta[1] = theta[1] + dt;
     	
+    	Delay.msDelay(500);
+    	PID( (int)theta[0], (int)theta[1]);
+    	
+    	Delay.msDelay(500);
+    	
     	PID( (int)dtheta[0], (int)dtheta[1]);
     	dpos[0] = tracker.x - pos[0];
     	dpos[1] = tracker.y - pos[1];
@@ -372,8 +377,10 @@ public class armVS {
     	jacobian[1][0] = dpos[0];
     	jacobian[1][1] = dpos[1];
     	
-    	PID( (int)pos[0], (int)pos[1]);
+    	Delay.msDelay(500);
+    	PID( (int)theta[0], (int)theta[1]);
     	
+    	System.out.println("jacobian estimated");
     	return jacobian;
 	
     }
@@ -405,10 +412,7 @@ public class armVS {
     	
     	return Jacob.getArray();
     	
-    	
-    	
-    			
-    			
+		
     }
 
     public static void VS(){
@@ -416,7 +420,7 @@ public class armVS {
 		// get initial positions
 		double target[] = new double[]{ tracker.targetx, tracker.targety};
 		double pos[] = new double[]{ tracker.x, tracker.y};
-		double oldPos[] = new double[]{ tracker.x, tracker.y};
+		//double oldPos[] = new double[]{ tracker.x, tracker.y};
 		
 		double dPos[] = new double[2];
 		double nxtP[] = new double[2];
@@ -532,19 +536,25 @@ public class armVS {
     }
     
     public static void main( String[] args) {
-		//tracker = new TrackerReader();
-		//tracker.start();
+		tracker = new TrackerReader();
+		tracker.start();
 		
 
         TACH[0] = firstLink.getTachoCount();
         TACH[1] = secondLink.getTachoCount();
         
+        while( tracker.x < 1){
+        	// wait until device is connected to camera
+        }
+        
         System.out.println("Lets Go!");
+        
+        VS();
         
         //firstLink.resetTachoCount();
         //secondLink.resetTachoCount();
         
-        testJUpdate();
+        //testJUpdate();
 
 
         //double[] outpt = kinematics.fwdKinPos( getAngle(), LINKS);
